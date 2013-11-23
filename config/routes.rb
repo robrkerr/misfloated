@@ -1,4 +1,5 @@
 Misquopes::Application.routes.draw do
+  resources :quotes, :path => '', :only => [:show,:index]
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

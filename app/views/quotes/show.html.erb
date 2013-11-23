@@ -1,0 +1,96 @@
+<div style="min-height: 280px; padding: 80px 20% 40px; font-size: 32pt">
+	<div id="quote-text" class="quote" style="text-align: center; padding: 20px 0px">
+		<%= @quote.quote_text %> 
+	</div>
+	<div id="quote-author" class="quote" style="text-align: right; padding: 20px 0px; font-size: 0.7em">
+		<%= @quote.quote_author %>
+	</div>
+</div>
+<div id="links" style="font-size: 20pt; text-align: center">
+	<div id="refresh_link" style="width: 49%; display: inline-block">
+		<a href="<%= @current_route %>">Wait, what?</a>
+	</div>
+	<div id="new_link" style="width: 49%; display: inline-block">
+		<a href="/">Moving on</a>
+	</div>
+</div>
+
+<script>
+	var filterOutBoringWords = function (array) {
+		var boringWords = ["and","a","an","is","in","to","the","of","at","we","i","it","from","your","not","you","if"];
+		return $.grep(array, function (value) {
+			return !_.contains(boringWords, value.toLowerCase());
+		});
+	};
+	var filterOutShortWords = function (array) {
+		return $.grep(array, function (value) {
+			return value.length > 2;
+		});
+	};
+	var capitaliseFirstLetter = function (string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	};
+	var isFirstLetterCapitalised = function (string) {
+		return string.charAt(0).toUpperCase() == string.charAt(0);
+	};
+	var stripOutPunctuation = function (string) {
+		return string.replace(".","").replace(",","").replace("?","").replace(":","").replace("”","").replace("“","");
+	};
+	var swap_in_rhymes = function (words) {
+		var nonBoringWords = filterOutBoringWords(words);
+		console.log(nonBoringWords);
+		var random = Math.floor(Math.random()*nonBoringWords.length)
+		var random_word = stripOutPunctuation(nonBoringWords[random].toLowerCase());
+		console.log(random_word);
+		if (random_word == "") {
+			swap_in_rhymes(words);
+			return 0;
+		}
+		$.getJSON("http://api.gift-rapped.com/rhyme/" + random_word + ".json?limit=50", function(data) {
+			var rhyming_words = [];
+			$.each(data, function(i,e) {
+				rhyming_words.push(e.primary_word.name);
+				// if (e.primary_word.lexemes.length > 0) {
+					// rhyming_words.push(e.primary_word.name);
+				// }
+				$.each(e.other_words, function(j,ee) {
+					rhyming_words.push(ee.name);
+					// if (ee.lexemes.length > 0) {
+					// 	rhyming_words.push(ee.name);
+					// }
+				});
+			});
+			rhyming_words = filterOutBoringWords(rhyming_words);
+			rhyming_words = filterOutShortWords(rhyming_words);
+			if ((rhyming_words.length == 0) && (nonBoringWords.length > 1)) {
+				swap_in_rhymes(words);
+				return 0;
+			} else if (rhyming_words.length == 0) {
+				//
+			} else {
+				new_word = rhyming_words[Math.floor(Math.random()*rhyming_words.length)];
+				new_words = words.map(function(value) {
+					w = stripOutPunctuation(value.toLowerCase());
+					if (w==random_word) {
+						toReplace = stripOutPunctuation(value);
+						if (isFirstLetterCapitalised(value)) {
+							replacement = capitaliseFirstLetter(new_word);
+						} else {
+							replacement = new_word;	
+						}
+						return value.replace(toReplace,replacement);
+					} else {
+						return value;
+					}
+				});
+				$("#quote-text").html(new_words.join(" "));
+				$(".quote").css("transition", "color 0.5s");
+				$(".quote").css("color", "black");
+			}
+		});
+	};
+	var text = $("#quote-text").html().trim();
+	$(".quote").css("color", "white");
+	var words = text.split(" ");
+	swap_in_rhymes(words);
+</script>
