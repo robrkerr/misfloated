@@ -34,7 +34,7 @@
 		return string.charAt(0).toUpperCase() == string.charAt(0);
 	};
 	var stripOutPunctuation = function (string) {
-		return string.replace(".","").replace(",","").replace("?","").replace(":","").replace("”","").replace("“","");
+		return string.replace(".","").replace(",","").replace("?","").replace(":","").replace("”","").replace("“","").replace("!","");
 	};
 	var swap_in_rhymes = function (words) {
 		var nonBoringWords = filterOutBoringWords(words);
