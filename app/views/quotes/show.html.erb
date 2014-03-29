@@ -38,26 +38,22 @@
 	};
 	var swap_in_rhymes = function (words) {
 		var nonBoringWords = filterOutBoringWords(words);
-		console.log(nonBoringWords);
 		var random = Math.floor(Math.random()*nonBoringWords.length)
 		var random_word = stripOutPunctuation(nonBoringWords[random].toLowerCase());
-		console.log(random_word);
 		if (random_word == "") {
 			swap_in_rhymes(words);
 			return 0;
 		}
-		$.getJSON("http://api.gift-rapped.com/rhyme/" + random_word + ".json?limit=50", function(data) {
+		$.getJSON("http://api.gift-rapped.com/rhyme/" + random_word + ".json", function(data) {
 			var rhyming_words = [];
 			$.each(data, function(i,e) {
-				rhyming_words.push(e.primary_word.name);
-				// if (e.primary_word.lexemes.length > 0) {
-					// rhyming_words.push(e.primary_word.name);
-				// }
+				if (e.primary_word.lexemes.length > 0) {
+					rhyming_words.push(e.primary_word.name);
+				}
 				$.each(e.other_words, function(j,ee) {
-					rhyming_words.push(ee.name);
-					// if (ee.lexemes.length > 0) {
-					// 	rhyming_words.push(ee.name);
-					// }
+					if (ee.lexemes.length > 0) {
+						rhyming_words.push(ee.name);
+					}
 				});
 			});
 			rhyming_words = filterOutBoringWords(rhyming_words);
