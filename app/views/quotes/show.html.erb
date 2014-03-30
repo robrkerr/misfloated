@@ -44,7 +44,7 @@
 			swap_in_rhymes(words);
 			return 0;
 		}
-		$.getJSON("http://api.gift-rapped.com/rhyme/" + random_word + ".json", function(data) {
+		$.getJSON("http://anywhere.anyrhyme.com/rhyme/" + random_word + ".json", function(data) {
 			var rhyming_words = [];
 			$.each(data, function(i,e) {
 				if (e.primary_word.lexemes.length > 0) {
